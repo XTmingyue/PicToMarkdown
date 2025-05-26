@@ -32,89 +32,22 @@
 - 支持Vercel、Netlify和传统服务器部署
 - 完善部署文档
 
-## 安装说明
+### v1.0.4 (2024-03-xx)
+- 修复Vercel部署后的API调用错误
+- 增强错误处理和日志记录
+- 优化环境变量配置
 
-1. 克隆仓库
-```bash
-git clone https://github.com/yourusername/PicToMarkdown.git
-```
+### v1.0.5 (2024-03-xx)
+- 优化API prompt，提高公式识别准确性
+- 添加公式格式规范化处理
+- 调整API参数配置，提高输出稳定性
 
-2. 安装依赖
-```bash
-cd PicToMarkdown
-npm install
-```
+### v1.0.6 (2024-03-xx)
+- 优化公式显示格式，添加$$符号包裹
+- 完善公式清理逻辑
+- 增强日志输出
 
-3. 配置环境变量
-创建`.env`文件并添加你的Gemini API密钥： 
-```
-
-## 部署说明
-
-### 使用Vercel部署（推荐）
-
-1. 安装Vercel CLI
-```bash
-npm install -g vercel
-```
-
-2. 登录Vercel
-```bash
-vercel login
-```
-
-3. 部署项目
-```bash
-vercel
-```
-
-4. 配置环境变量
-在Vercel项目设置中添加环境变量：
-- `REACT_APP_GEMINI_API_KEY`: 你的Gemini API密钥
-
-### 使用Netlify部署
-
-1. 安装Netlify CLI
-```bash
-npm install -g netlify-cli
-```
-
-2. 登录Netlify
-```bash
-netlify login
-```
-
-3. 部署项目
-```bash
-netlify deploy
-```
-
-4. 配置环境变量
-在Netlify项目设置中添加环境变量：
-- `REACT_APP_GEMINI_API_KEY`: 你的Gemini API密钥
-
-### 使用传统服务器部署
-
-1. 构建项目
-```bash
-npm run build
-```
-
-2. 将`build`目录下的所有文件上传到服务器的网站根目录
-
-3. 配置Nginx（示例配置）：
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /path/to/your/build;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
-4. 配置环境变量
-在服务器上设置环境变量或在`.env.production`文件中配置：
+### v1.0.7 (2024-03-xx)
+- 修复公式预览渲染问题
+- 优化公式字符串处理
+- 确保公式前后$$符号格式统一

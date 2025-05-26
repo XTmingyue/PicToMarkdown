@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
 import 'katex/dist/katex.min.css';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
+import katex from 'katex';
 
 function FormulaParser({ image, onParseResult, markdown }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,14 +24,19 @@ function FormulaParser({ image, onParseResult, markdown }) {
         
         try {
           console.log('开始调用Gemini API...');
-          // 调用Gemini API - 使用新的模型版本
+          // 检查API密钥是否存在
+          if (!process.env.REACT_APP_GEMINI_API_KEY) {
+            throw new Error('API密钥未配置');
+          }
+          
+          // 调用Gemini API
           const response = await axios.post(
             'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent',
             {
               contents: [{
                 parts: [
                   {
-                    text: "请识别这张图片中的数学公式，并以LaTeX格式返回。只返回公式本身，不要包含其他解释。"
+                    text: `请识别这张图片中的数学公式，并以标准的LaTeX格式返回。`
                   },
                   {
                     inline_data: {
@@ -44,9 +47,9 @@ function FormulaParser({ image, onParseResult, markdown }) {
                 ]
               }],
               generationConfig: {
-                temperature: 0.4,
-                topK: 32,
-                topP: 1,
+                temperature: 0.1, // 降低温度以获得更稳定的输出
+                topK: 1,         // 限制输出选项
+                topP: 0.1,       // 降低采样概率
                 maxOutputTokens: 2048,
               }
             },
@@ -60,19 +63,35 @@ function FormulaParser({ image, onParseResult, markdown }) {
 
           console.log('API调用成功，完整响应:', response.data);
           
-          // 从响应中提取公式，直接使用API返回的结果
-          const formula = response.data.candidates[0].content.parts[0].text.trim();
-          console.log('提取的公式:', formula);
+          // 从响应中提取公式并清理
+          let formula = response.data.candidates[0].content.parts[0].text.trim();
           
-          // 直接使用API返回的公式，不添加额外的$符号
+          // 清理可能的额外字符
+          formula = formula
+            .replace(/^`+|`+$/g, '')   // 先移除首尾的反引号
+            .replace(/^latex/i, '')    // 再移除开头的latex字符串（不区分大小写）
+            .replace(/^\$+|\$+$/g, '') // 移除首尾的所有$符号
+            .trim();
+
+          // 确保公式前后只有两个$符号
+          formula = `$$${formula}$$`;
+            
+          console.log('清理后的公式:', formula);
+          
           onParseResult(formula);
         } catch (err) {
           console.error('API调用错误，详细信息:', {
             message: err.message,
             response: err.response?.data,
             status: err.response?.status,
-            headers: err.response?.headers
+            headers: err.response?.headers,
+            env: {
+              hasApiKey: !!process.env.REACT_APP_GEMINI_API_KEY,
+              nodeEnv: process.env.NODE_ENV
+            }
           });
+          
+          setError(`API调用失败: ${err.message}`);
           
           // 模拟成功结果用于演示
           console.log('使用模拟数据进行演示');
@@ -116,14 +135,15 @@ function FormulaParser({ image, onParseResult, markdown }) {
             className="markdown-result"
           />
           <h3>预览效果</h3>
-          <div className="markdown-preview">
-            <ReactMarkdown
-              remarkPlugins={[remarkMath]}
-              rehypePlugins={[rehypeKatex]}
-            >
-              {markdown}
-            </ReactMarkdown>
-          </div>
+          <div 
+            className="markdown-preview"
+            dangerouslySetInnerHTML={{
+              __html: katex.renderToString(markdown.replace(/^\$\$|\$\$$/g, ''), {
+                displayMode: true,
+                throwOnError: false
+              })
+            }}
+          />
         </div>
       )}
     </div>
