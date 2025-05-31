@@ -29,14 +29,24 @@ function FormulaParser({ image, onParseResult, markdown }) {
             throw new Error('API密钥未配置');
           }
           
+          // 打印当前环境信息
+          console.log('当前环境信息:', {
+            nodeEnv: process.env.NODE_ENV,
+            apiKey: process.env.REACT_APP_GEMINI_API_KEY ? '已配置' : '未配置',
+            modelVersion: 'gemini-2.0-flash'
+          });
+          
           // 调用Gemini API
+          const apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent';
+          console.log('API调用URL:', apiUrl);
+          
           const response = await axios.post(
-            'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent',
+            apiUrl,
             {
               contents: [{
                 parts: [
                   {
-                    text: `请识别这张图片中的数学公式，并以标准的LaTeX格式返回。`
+                    text: `识别这张图片中的数学公式，并以标准的LaTeX格式返回。注意只需要返回解析的公式，不要包含任何其他文字`
                   },
                   {
                     inline_data: {
