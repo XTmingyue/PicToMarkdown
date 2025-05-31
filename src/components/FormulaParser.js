@@ -31,7 +31,7 @@ function FormulaParser({ image, onParseResult, markdown }) {
           
           // 调用Gemini API
           const response = await axios.post(
-            'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent',
+            'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent',
             {
               contents: [{
                 parts: [
@@ -47,9 +47,9 @@ function FormulaParser({ image, onParseResult, markdown }) {
                 ]
               }],
               generationConfig: {
-                temperature: 0.1, // 降低温度以获得更稳定的输出
-                topK: 1,         // 限制输出选项
-                topP: 0.1,       // 降低采样概率
+                temperature: 0.1,
+                topK: 1,
+                topP: 0.1,
                 maxOutputTokens: 2048,
               }
             },
